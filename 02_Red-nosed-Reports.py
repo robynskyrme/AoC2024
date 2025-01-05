@@ -30,19 +30,26 @@ def safety_check(report):                   # Check a single report (line) for s
     else:
         climb = False
 
+    safe = False
+
     while index < len(report):
         slope = report[index] - report[index-1]
-        if slope < 0 and climb == True:
-            return "DIRECTION CHANGES"
-        if slope > 0 and climb == False:
-            return "DIRECTION CHANGES"
         if abs(slope) > max or abs(slope) < min:
-            return "CHANGE TOO STEEP (OR NO CHANGE)"
+            safe = False
+        elif slope < 0 and climb == True:
+            safe = False
+        elif  slope > 0 and climb == False:
+            safe = False
+        else:
+            safe = True
         gradient.append(slope)
         index += 1
 
-    return True
+    return safe
 
+                                            # function added for PART TWO
+def single_peak(report):         # checks if there is a single peak which, if removed, keeps the report in a gradient
+    print(report)
 
 
 if __name__ == "__main__":
