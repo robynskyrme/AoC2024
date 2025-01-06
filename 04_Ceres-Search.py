@@ -3,6 +3,9 @@
 # Advent of Code 2024
 # Day 6: Ceres Search
 
+# This is a nightmare and I am going to give up and move on to the next one
+
+
 import time
 
 def is_string(raw,index,string):
