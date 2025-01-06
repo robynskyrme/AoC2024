@@ -102,7 +102,6 @@ if __name__ == "__main__":
     stopwatch = time.time()
 
     file = open("03_1.aoc","r")
-
     input = file.read()
     file.close()
 
