@@ -33,8 +33,6 @@ def process(raw):
 
     init_banned = set(right)                             # This list constitues all pages with a required precedent:
                                                     # they are therefore, before any pages have been added, forbidden
-
-
     return rules, raw, init_banned                  # all that's left of 'raw' has now become the list of updates
 
 
@@ -43,12 +41,29 @@ def check(update,rules,banned):
 
     valid = True
 
+    allow = set()
+
+    print(banned)
+
+    for page in banned:
+        for preceding in rules:
+            if page in rules[preceding]:
+                if preceding not in update:
+                    allow.add(page)
+                    print("allowing" + page)
+
+    for each in allow:
+        banned.remove(each)
+
     print(update)
+    print(banned)
 
     while update:
         page = update[0]
         #print(page)
-        if page in banned:                 # if the page can't
+        if page in banned:
+            print(page)
+            print("boom")           # if the page can't
             return False
         if page in rules:
             following = rules[page]
@@ -78,9 +93,8 @@ if __name__ == "__main__":
 
     print(rules)
 
-    # for i in range(len(updates)):
-    #     print(check(updates[i],rules,init_banned))
+    for i in range(len(updates)):
+        print(check(updates[i],rules,init_banned))
 
-    print(check(updates[0],rules,init_banned))
 
     print("\n/// done in " + str(time.time()-stopwatch) +" seconds ///")
