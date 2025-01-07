@@ -1,130 +1,138 @@
-# 6.1.2025
+# 7.1.2025
 
 # Advent of Code 2024
-# Day 6: Ceres Search
-
-# This is a nightmare and I am going to give up and move on to the next one
-
+# Day 4: Ceres Search
 
 import time
 
-def is_string(raw,index,string):
-    for i in range(len(string)):
-        if raw[index] != string[i]:
-            return False
-        index += 1
-    return True
+class wordsearch():
+    grid = []
+    width = 0
+    height = 1
+    def __init__(self,path):
+        self.path = path
+
+        file = open(path, "r")
+        input = file.read()
+        file.close()
+
+        self.process(input)
+
+    def process(self,raw):
+        self.width = 0
+        width_gathered = False
+
+        data = []
+
+        while raw:
+            if raw[:1] == "\n":
+                self.height += 1
+                width_gathered = True
+                raw == raw[1:]
+            else:
+                data.append(raw[0])
+                if width_gathered == False:
+                    self.width += 1
+            raw = raw[1:]
+
+        self.grid = data
+
+    def extract(self,index,length,direction):          # DIRECTION key: 1 horizontal 2 vertical 3 fwdslash 4 backslash
+        word = ""                                      # if the extract asked for is out of grid bounds, returns None
+        width = self.width
+        height = self.height
+
+        margin_left = length - 1
+        margin_right = width - length
+        margin_top = width * (length - 1)
+        margin_bottom = (height - length + 1) * width
+
+        cells = []
+
+        pos = index % width
+
+        for cell in range(length):
+            cells.append(index)
+
+        if direction == 1:                            # FORWARD
+            if pos > margin_right:
+                return None
+            for inc in range(length):
+                cells[inc] += inc
+
+        if direction == 2:                            # UP
+            if index < margin_top:
+                return None
+            for inc in range(length):
+                cells[inc] -= inc * width
+
+        if direction == 3:                            # FORWARD SLASH
+            if index >= margin_bottom or pos < margin_left:
+                return None
+            for inc in range(length):
+                cells[inc] += inc * width - inc
+
+        if direction == 4:                            # BACK SLASH
+            if index >= margin_bottom or pos > margin_right:
+                return None
+            for inc in range(length):
+                cells[inc] += inc * width + inc
+
+        for cell in range(length):                      # turn the cells gathered into a string
+            word += self.grid[cells[cell]]
+
+        return word
+
+    def xmas(self):                                     # PART TWO of the problem
+
+        hits = 0
+
+        w = self.width
+        h = self.height
+        for cell in range(w * h):
+            letter = self.grid[cell]
+            if letter == "A":
+                fwd = self.extract(cell+1-w,3,3)
+                back = self.extract(cell-1-w,3,4)
+                if fwd == "SAM" or fwd == "MAS":
+                    if back == "SAM" or back == "MAS":
+                        hits += 1
+
+        return hits
 
 
-def search(grid,word):
-    fwd = word                                                        # OK horizontal forward/backward are easy
-    back = ""
-    for i in range(len(word)-1,-1,-1):
-        back += (word[i])
 
-    horizontal = 0
-    vertical = 0
-    diagonal = 0
+    def search(self,word):
+        hits = 0
 
-    for j in range(len(grid)-1):
-        if j % grid[0] <= grid[0] - len(word) + 1:
-            if is_string(grid,j,fwd):                               # these 'mod' bits are just to stop it from
-                                                                    # reading words over linebreaks
-                horizontal += 1
-            if is_string(grid,j,back):
-                horizontal += 1
+        backword = ""
+        for i in range(len(word)):
+            backword += word[len(word)-1-i]
 
-            if j <= len(grid) - grid[0] * (len(word) - 1):
-                if is_string_diagfwd(grid, j, fwd):
-                    diagonal += 1
-                if is_string_diagfwd(grid, j, back):
-                    diagonal += 1
-
-            if j <= len(grid) - grid[0] * (len(word) - 1):
-                if is_string_diagback(grid, j, fwd):
-                    diagonal += 1
-                if is_string_diagback(grid, j, back):
-                    diagonal += 1
-
-
-        if j <= len(grid) - grid[0] * (len(word)-1):                # search for horizontal, vertical, and BOTH diagonals!
-                                                                    # (i somehow forgot vertical AND one diagonal at first)
-            if is_string_vert(grid,j,fwd):
-                vertical += 1
-            if is_string_vert(grid,j,back):
-                vertical += 1
-
-
-    output_individual = True
-
-    if output_individual:
-        print(horizontal)
-        print(vertical)
-        print(diagonal)
-
-    return horizontal + vertical + diagonal
+        for direction in range(1,7):
+            for cell in range(self.width * self.height):
+                get = self.extract(cell,len(word),direction)
+                if get == word or get == backword:
+                    hits += 1
+        return hits
 
 
 
-def is_string_vert(raw,index,string):
-
-    for i in range(len(string)):
-        if raw[index] != string[i]:
-            return False
-        index += raw[0]
-    return True
 
 
-def is_string_diagfwd(raw,index,string):
-
-    for i in range(len(string)):
-        if raw[index] != string[i]:
-            return False
-        index += raw[0]+1
-    return True
-
-def is_string_diagback(raw,index,string):
-
-    for i in range(len(string)):
-        if raw[index] != string[i]:
-            return False
-        index += raw[0]-1
-    return True
-
-def process(input):                            # make the crossword grid into one long list of letters, with index 0
-                                               # storing the width of the grid
-    linelength = 0
-
-    data = [0]
-
-    while input:
-        if input[:1] == "\n":
-            data[0] = linelength
-            linelength = 0
-            input == input[1:]
-        else:
-            data.append(input[0])
-            linelength += 1
-        input = input[1:]
-
-    return(data)
 
 
 
 if __name__ == "__main__":
     stopwatch = time.time()
 
-    file = open("04_1.aoc","r")
-    input = file.read()
-    file.close()
+    ceres = wordsearch("04_1.aoc")
 
-    grid = process(input)
+    part_one = ceres.search("XMAS")
 
-    # test puzzle as provided on AoC
-    #grid = process("MMMSXXMASM\nMSAMXMSMSA\nAMXSXMAAMM\nMSAMASMSMX\nXMASAMXAMM\nXXAMMXXAMA\nSMSMSASXSS\nSAXAMASAAA\nMAMMMXMMMM\nMXMXAXMASX")
+    part_two = ceres.xmas()
 
-    total = search(grid,"XMAS")
-
-    print("Total: " + str(total))
+    print("XMAS occurences: " + str(part_one))
+    print("X-MAS occurences: " + str(part_two))
 
     print("\n/// done in " + str(time.time()-stopwatch) +" seconds ///")
