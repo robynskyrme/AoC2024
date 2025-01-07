@@ -72,7 +72,8 @@ class guard():
                     showmap()
                     return
                 self.stepfwd()
-                showmap()
+
+            showmap()
 
 
     def stepfwd(self):
@@ -102,7 +103,7 @@ def showmap():
     chunk = ""
     for i in range(len(map)):
         for j in range(len(map[i])):
-            chunk += map[i][j] + " "
+            chunk += map[i][j] #+ " "
         chunk += "\n"
     print(chunk)
     print("Positions visited: " + str(guard.odometer))
@@ -122,7 +123,7 @@ def process(raw):
 if __name__ == "__main__":
     stopwatch = time.time()
 
-    file = open("06_example.aoc")
+    file = open("06_puzzle.aoc")
     data = file.readlines()
     file.close()
 
