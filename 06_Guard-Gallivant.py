@@ -42,8 +42,6 @@ class guard():
         if o == 9:
             self.facing = [col-1, row]
 
-        print(self.facing)
-
         if self.facing[1] < 0 or self.facing[1] >= len(map[0]) or self.facing[0] < 0 or self.facing[0] >= len(map):
             self.beyondmap = True
 
@@ -55,35 +53,36 @@ class guard():
         if infront == "#":
             self.turn()
 
-    def walk(self):
+    def walk(self,steps):
 
-        steps = ""
+        while steps != "stop":                          # User-input (enter for one step, otherwise,a number of steps)
 
-        while steps != "stop":
-
-            steps = input()
             if steps == "":
-                steps = 1
+                steps = input()
+                if steps == "":
+                    steps = 1
 
             for march in range(int(steps)):
                 self.lookinfront()
-                if self.beyondmap == True:
+                if self.beyondmap == True:                                   # If the guard's stepping off the map...
                     self.markasvisited(self.row,self.col)
                     showmap()
+                    print("Total positions visited: " + str(guard.odometer)) # The program can end
                     return
-                self.stepfwd()
+                self.stepfwd()                                               # Otherwiswe, keep going
 
             showmap()
+            print("Positions visited: " + str(guard.odometer))
 
 
-    def stepfwd(self):
-        self.markasvisited(self.row,self.col)
+    def stepfwd(self):                                                      # Take a single step forward
+        self.markasvisited(self.row,self.col)                               # marking the square as visited
         map[self.facing[1]][self.facing[0]] = ochar(self.o)
         self.col = self.facing[0]
         self.row = self.facing[1]
 
-        if [self.row,self.col] not in self.visited:
-            self.odometer += 1
+        if [self.row,self.col] not in self.visited:                         # add the new square to our record
+            self.odometer += 1                                              # (so long as it hasn't already been visited)
 
     def markasvisited(self,row,col):
         self.visited.append([self.row,self.col])
@@ -106,7 +105,7 @@ def showmap():
             chunk += map[i][j] #+ " "
         chunk += "\n"
     print(chunk)
-    print("Positions visited: " + str(guard.odometer))
+
 
 
 def process(raw):
@@ -131,9 +130,12 @@ if __name__ == "__main__":
 
     guard = guard(guardx,guardy,12)
 
-    showmap()
+    # showmap()
+    # print("Positions visited: " + str(guard.odometer))
 
-    guard.walk()
+    guard.walk(10000)
+
+
 
     print("\n/// done in " + str(time.time()-stopwatch) +" seconds ///")
 
